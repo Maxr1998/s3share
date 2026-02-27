@@ -90,7 +90,7 @@
             await streamDownloadDecryptToDisk(info.url, fileDecrypter, downloadOutputStream, progressTracker)
             downloading = DownloadState.Completed
         } catch (e) {
-            DownloadState.Failure
+            downloading = DownloadState.Failure
         }
     }
 
