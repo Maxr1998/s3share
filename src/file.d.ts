@@ -6,7 +6,15 @@ declare class FileInfo {
 
 declare class FileMetadata {
     name: EncryptedValue;
-    checksum: EncryptedValue;
+    /**
+     * Legacy property that contains an encrypted MD5 checksum.
+     * Replaced by `checksums`.
+     */
+    checksum?: EncryptedValue;
+    /**
+     * Contains key/value pairs of the algorithm and an encrypted checksum.
+     */
+    checksums?: Record<string, EncryptedValue>;
     iv: string;
     size: number;
 }

@@ -15,12 +15,21 @@
             {/if}
             {#if downloading === DownloadState.Idle || downloading === DownloadState.Completed}
                 <div class="checksum-box">
-                    <h5>MD5 checksum (click to copy):</h5>
-                    <span class="checksum"
-                          onclick="{copyChecksum}"
-                          onkeydown="{(e) => {e.key === 'Enter' && copyChecksum()}}"
-                          role="button"
-                          tabindex="0">{downloadInfo.checksum}</span>
+                    <h5>Checksums (click to copy)</h5>
+                    <div class="checksum-container">
+                        {#each downloadInfo.checksums as [alg, checksum]}
+                            <div class="checksum-col">
+                                <span class="alg">{alg}</span>
+                            </div>
+                            <div class="checksum-col">
+                                <span class="checksum"
+                                      onclick="{() => copyToClipboard(checksum)}"
+                                      onkeydown="{(e) => {e.key === 'Enter' && copyToClipboard(checksum)}}"
+                                      role="button"
+                                      tabindex="0">{checksum}</span>
+                            </div>
+                        {/each}
+                    </div>
                 </div>
             {/if}
         {:else}
@@ -39,16 +48,35 @@
     }
 
     .checksum-box h5 {
-        margin: 0;
+        margin: 0 0 8px;
+    }
+
+    .checksum-container {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        grid-column-gap: 4px;
+        grid-row-gap: 4px;
+        font-size: 0.6rem;
+        font-family: monospace;
+    }
+
+    .checksum-col {
+        text-align: left;
+    }
+
+    .alg, .checksum {
+        padding: 1px 0.3rem;
+        background: var(--button-color);
+        border: 1px solid transparent;
+        border-radius: 4px;
+    }
+
+    .alg {
+        background: var(--chip-color);
+        color: #faa;
     }
 
     .checksum {
-        font-size: 0.8em;
-        font-family: monospace;
-        padding: 1px 2px;
-        background: #101010;
-        border: 1px solid transparent;
-        border-radius: 4px;
         cursor: pointer;
     }
 </style>
@@ -96,9 +124,7 @@
         }
     }
 
-    function copyChecksum() {
-        const checksum = downloadInfo?.checksum
-        if (!checksum) return
-        navigator.clipboard.writeText(checksum)
+    function copyToClipboard(text: string) {
+        navigator.clipboard.writeText(text)
     }
 </script>

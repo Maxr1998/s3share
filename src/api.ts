@@ -1,17 +1,16 @@
-import {decrypt, decryptToString, importIv, importKey} from "./utils/crypto";
-import {uint8ArrayToHex} from "uint8array-extras";
+import {decryptToHex, decryptToString, type EncryptedValue, importIv, importKey} from "./utils/crypto";
 
 export class DownloadInfo {
     name: string
-    checksum: string
+    checksums: Map<string, string>
     url: string
     size: number
     key: CryptoKey
     iv: bigint
 
-    constructor(name: string, checksum: string, url: string, size: number, key: CryptoKey, iv: bigint) {
+    constructor(name: string, checksums: Map<string, string>, url: string, size: number, key: CryptoKey, iv: bigint) {
         this.name = name
-        this.checksum = checksum
+        this.checksums = checksums
         this.url = url
         this.size = size
         this.key = key
@@ -42,7 +41,27 @@ export async function loadDownloadInfo(): Promise<DownloadInfo> {
     })
 
     const name = await decryptToString(fileInfo.metadata.name, key)
-    const checksum = uint8ArrayToHex(await decrypt(fileInfo.metadata.checksum, key))
+    const checksums = await decryptChecksums(fileInfo, key)
     const iv = importIv(fileInfo.metadata.iv)
-    return new DownloadInfo(name, checksum, fileInfo.url, fileInfo.metadata.size, key, iv)
+    return new DownloadInfo(name, checksums, fileInfo.url, fileInfo.metadata.size, key, iv)
+}
+
+async function decryptChecksums(fileInfo: FileInfo, key: CryptoKey): Promise<Map<string, string>> {
+    const checksumPromises: Promise<[string, string]>[] = []
+
+    const append = (alg: string, checksum: EncryptedValue) => {
+        checksumPromises.push(decryptToHex(checksum, key).then(d => [alg, d]))
+    }
+
+    if (fileInfo.metadata.checksum) {
+        append("MD5", fileInfo.metadata.checksum)
+    }
+
+    if (fileInfo.metadata.checksums) {
+        for (const [alg, encrypted] of Object.entries(fileInfo.metadata.checksums)) {
+            append(alg, encrypted)
+        }
+    }
+
+    return new Map<string, string>(await Promise.all(checksumPromises))
 }

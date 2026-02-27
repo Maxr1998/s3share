@@ -1,5 +1,5 @@
 import {bnToUint8Array, bufToBn} from "./conversion";
-import {base64ToUint8Array} from "uint8array-extras";
+import {base64ToUint8Array, uint8ArrayToHex} from "uint8array-extras";
 
 const subtle = window.crypto.subtle;
 
@@ -69,4 +69,9 @@ export async function decrypt(value: EncryptedValue, key: CryptoKey): Promise<Ui
 export async function decryptToString(value: EncryptedValue, key: CryptoKey): Promise<string> {
     const buf = await decrypt(value, key)
     return new TextDecoder().decode(buf)
+}
+
+export async function decryptToHex(value: EncryptedValue, key: CryptoKey): Promise<string> {
+    const buf = await decrypt(value, key)
+    return uint8ArrayToHex(buf)
 }
