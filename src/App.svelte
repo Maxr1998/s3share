@@ -72,6 +72,7 @@
         try {
             downloadInfo = await loadDownloadInfo()
         } catch (e) {
+            console.error(e)
             error = e
         }
     })
@@ -90,6 +91,7 @@
             await streamDownloadDecryptToDisk(info.url, fileDecrypter, downloadOutputStream, progressTracker)
             downloading = DownloadState.Completed
         } catch (e) {
+            console.error(e)
             downloading = DownloadState.Failure
         }
     }
