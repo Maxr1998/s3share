@@ -11,7 +11,8 @@
             {:else if downloading === DownloadState.Completed}
                 <p>Successfully downloaded {downloadInfo.name}.</p>
             {:else if downloading === DownloadState.Failure}
-                <p>Download failed</p>
+                <h3 class="error">Download failed</h3>
+                <button type="button" onclick="{() => downloading = DownloadState.Idle}">Retry</button>
             {/if}
             {#if downloading === DownloadState.Idle || downloading === DownloadState.Completed}
                 <div class="checksum-box">

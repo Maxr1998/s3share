@@ -76,7 +76,10 @@ button:focus-visible {
     outline: 4px auto -webkit-focus-ring-color;
 }
 
-p.error {
+.error {
     color: var(--error-color);
+}
+
+p.error {
     font-weight: 600;
 }
