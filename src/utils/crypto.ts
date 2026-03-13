@@ -44,10 +44,10 @@ export class FileDecrypter {
     async decrypt(ciphertext: Uint8Array): Promise<Uint8Array> {
         const params: AesCtrParams = {
             name: "AES-CTR",
-            counter: this.counterArray,
+            counter: this.counterArray as BufferSource,
             length: COUNTER_BITS,
         }
-        const plaintext = subtle.decrypt(params, this.key, ciphertext)
+        const plaintext = subtle.decrypt(params, this.key, ciphertext as BufferSource)
         this.incrementCounter(ciphertext.byteLength)
 
         return new Uint8Array(await plaintext)
