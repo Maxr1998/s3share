@@ -26,7 +26,7 @@ export async function onRequest({request, env}) {
         });
     }
 
-    const metadataJson = await env.KV.get(fileId);
+    const metadataJson = await env.METADATA.get(fileId);
     if (metadataJson === null) {
         return new Response(null, {
             status: 404,
