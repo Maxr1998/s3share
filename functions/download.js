@@ -1,16 +1,10 @@
-import {GetObjectCommand, S3Client} from '@aws-sdk/client-s3';
+import {GetObjectCommand} from '@aws-sdk/client-s3';
 import {getSignedUrl} from "@aws-sdk/s3-request-presigner";
+import {getS3Client} from "../lib/server/s3.js";
 
-async function generateDownloadUrl(env, bucket, key) {
-    const s3client = new S3Client({
-        region: 'auto', // not applicable but required by SDK
-        endpoint: env.S3_ENDPOINT,
-        credentials: {
-            accessKeyId: env.S3_ACCESS_KEY,
-            secretAccessKey: env.S3_SECRET_KEY,
-        },
-    });
-    const command = new GetObjectCommand({Bucket: bucket, Key: key});
+async function generateDownloadUrl(env, key) {
+    const s3client = await getS3Client(env);
+    const command = new GetObjectCommand({Bucket: env.S3_BUCKET, Key: key});
     return await getSignedUrl(s3client, command, {expiresIn: 600});
 }
 
@@ -35,7 +29,7 @@ export async function onRequest({request, env}) {
     }
 
     const metadata = JSON.parse(metadataJson);
-    const downloadUrl = await generateDownloadUrl(env, env.S3_BUCKET,  fileId);
+    const downloadUrl = await generateDownloadUrl(env, fileId);
 
     return Response.json({
         file_id: fileId,
