@@ -1,8 +1,9 @@
+import {env} from "cloudflare:workers";
 import {S3Client} from "@aws-sdk/client-s3";
 
 let s3client
 
-export function getS3Client(env) {
+export function getS3Client() {
     if (!s3client) {
         s3client = new S3Client({
             region: 'auto', // not applicable but required by SDK
