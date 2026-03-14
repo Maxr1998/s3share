@@ -3,8 +3,9 @@ import {env} from "cloudflare:workers"
 import {getS3Client} from "../util/s3client"
 import {GetObjectCommand} from "@aws-sdk/client-s3"
 import {getSignedUrl} from "@aws-sdk/s3-request-presigner"
+import type {FileInfo, FileMetadata} from "../api";
 
-export async function download(url: URL) {
+export async function download(url: URL): Promise<Response> {
     const params = new URLSearchParams(url.search)
 
     const fileId = params.get('file')
@@ -21,14 +22,14 @@ export async function download(url: URL) {
             statusText: 'File not found',
         })
     }
-    const metadata = JSON.parse(metadataJson)
+    const metadata: FileMetadata = JSON.parse(metadataJson)
     const downloadUrl = await generateDownloadUrl(fileId)
-    return Response.json({
+    const fileInfo: FileInfo = {
         file_id: fileId,
         metadata: metadata,
         url: downloadUrl,
-    })
-
+    }
+    return Response.json(fileInfo)
 }
 
 async function generateDownloadUrl(key: string): Promise<string> {

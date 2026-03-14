@@ -1,5 +1,6 @@
-import {bnToUint8Array, bufToBn} from "./conversion";
-import {base64ToUint8Array, uint8ArrayToHex} from "uint8array-extras";
+import {bnToUint8Array, bufToBn} from "./conversion"
+import {base64ToUint8Array, uint8ArrayToHex} from "uint8array-extras"
+import type {EncryptedValue} from "../../worker/api"
 
 const subtle = window.crypto.subtle;
 
@@ -52,11 +53,6 @@ export class FileDecrypter {
 
         return new Uint8Array(await plaintext)
     }
-}
-
-export interface EncryptedValue {
-    value: string;
-    iv: string;
 }
 
 export async function decrypt(value: EncryptedValue, key: CryptoKey): Promise<Uint8Array> {

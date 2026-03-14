@@ -1,10 +1,10 @@
-declare class FileInfo {
+export type FileInfo = {
     file_id: string;
     metadata: FileMetadata;
     url: string;
 }
 
-declare class FileMetadata {
+export type FileMetadata = {
     name: EncryptedValue;
     /**
      * Legacy property that contains an encrypted MD5 checksum.
@@ -19,7 +19,7 @@ declare class FileMetadata {
     size: number;
 }
 
-declare class EncryptedValue {
+export type EncryptedValue = {
     value: string;
     iv: string;
 }
