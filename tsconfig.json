@@ -7,7 +7,9 @@
     "resolveJsonModule": true,
     "types": [
       "svelte",
-      "vite/client"
+      "vite/client",
+      "./worker-configuration.d.ts",
+      "node"
     ],
     /**
      * Typecheck JS in `.svelte` and `.js` files by default.

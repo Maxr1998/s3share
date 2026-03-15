@@ -1,4 +1,3 @@
-// @ts-ignore
 import {env} from "cloudflare:workers"
 import {S3Client} from "@aws-sdk/client-s3"
 
