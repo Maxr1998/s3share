@@ -9,13 +9,16 @@ import {showSaveFilePicker} from "native-file-system-adapter";
 export async function createDownloadWritableStream(filename: string, filesize: number): Promise<WritableStream> {
     const extension = filename.split('.').pop()
 
+    const types = []
+    if (extension && extension.length > 0) {
+        types.push({accept: {"application/octet-stream": [`.${extension}`]}})
+    }
+
     const handle = await showSaveFilePicker({
         suggestedName: filename,
         // @ts-ignore
         startIn: "downloads",
-        types: [{
-            accept: {"application/octet-stream": [`.${extension}`]}
-        }]
+        types: types,
     })
 
     return handle.createWritable({
