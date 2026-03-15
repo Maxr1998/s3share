@@ -12,7 +12,7 @@
             <h3 class="error">Download failed</h3>
             <button type="button" onclick="{() => downloading = DownloadState.Idle}">Retry</button>
         {/if}
-        {#if downloading === DownloadState.Idle || downloading === DownloadState.Completed}
+        {#if (downloading === DownloadState.Idle || downloading === DownloadState.Completed) && downloadInfo.checksums.size > 0}
             <div class="checksum-box">
                 <h5>Checksums (click to copy)</h5>
                 <div class="checksum-container">
