@@ -24,6 +24,7 @@
     "@aws-sdk/s3-request-presigner": "^3.1009.0",
     "native-file-system-adapter": "^3.0.1",
     "pretty-bytes": "^7.1.0",
-    "uint8array-extras": "^1.5.0"
+    "uint8array-extras": "^1.5.0",
+    "zod": "^4.3.6"
   }
 }
