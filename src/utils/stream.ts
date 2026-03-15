@@ -1,14 +1,15 @@
 import {isUint8Array} from "uint8array-extras";
-import {AES_BLOCK_SIZE, FileDecrypter} from "./crypto";
 import type {ProgressTracker} from "./progress";
 import {FETCH_FAILED} from "../constants";
+import {FileDecryptor} from "../crypto/decryptor";
+import {AES_BLOCK_SIZE} from "../crypto/constants";
 
 interface BufferedTransformer<I = any, O = any> extends Transformer<I, O> {
     buffer?: Uint8Array | null
 }
 
 export async function streamDownloadDecryptToDisk(url: string,
-                                                  fileDecrypter: FileDecrypter,
+                                                  fileDecrypter: FileDecryptor,
                                                   outputStream: WritableStream,
                                                   progressTracker: ProgressTracker) {
     const responseBodyStream = fetch(url).then(response => {

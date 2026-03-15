@@ -1,5 +1,6 @@
-import {decryptToHex, decryptToString, importIv, importKey} from "./utils/crypto"
+import {decryptToHex, decryptToString} from "./crypto/utils"
 import type {EncryptedValue, FileInfo} from "../worker/api"
+import {importIv, importKey} from "./crypto/key";
 
 export class DownloadInfo {
     name: string

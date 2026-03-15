@@ -82,12 +82,12 @@
 <script lang="ts">
     import {DownloadInfo, loadDownloadInfo} from "../api";
     import {onMount} from "svelte";
-    import {FileDecrypter} from "../utils/crypto";
     import {ProgressTracker} from "../utils/progress";
     import {streamDownloadDecryptToDisk} from "../utils/stream";
     import prettyBytes from "pretty-bytes";
     import {createDownloadWritableStream} from "../utils/file";
     import {DownloadState} from "../constants";
+    import {FileDecryptor} from "../crypto/decryptor";
 
     let error = $state()
     let downloadInfo = $state<DownloadInfo>()
@@ -108,7 +108,7 @@
         if (!info) return
 
         downloading = DownloadState.Downloading
-        const fileDecrypter = new FileDecrypter(info.key, info.iv)
+        const fileDecrypter = new FileDecryptor(info.key, info.iv)
         const progressTracker = new ProgressTracker(info.size, (progress, total) => {
             downloadProgress = ` (${prettyBytes(progress)} / ${prettyBytes(total)})`
         })
