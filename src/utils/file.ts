@@ -1,4 +1,4 @@
-import {showSaveFilePicker} from "native-file-system-adapter"
+import {showOpenFilePicker, showSaveFilePicker} from "native-file-system-adapter"
 
 /**
  * Create a file readable stream from a file picker
@@ -16,7 +16,7 @@ export async function createDownloadWritableStream(filename: string, filesize: n
 
     const handle = await showSaveFilePicker({
         suggestedName: filename,
-        // @ts-ignore
+        // @ts-ignore startIn is available in browsers, but not in this adapter type definition
         startIn: "downloads",
         types: types,
     })
@@ -25,4 +25,30 @@ export async function createDownloadWritableStream(filename: string, filesize: n
         // @ts-ignore
         size: filesize,
     })
+}
+
+/**
+ * Open a file picker and return a single file for upload.
+ *
+ * Returns null when the user cancels the picker.
+ */
+export async function pickUploadFile(): Promise<File | null> {
+    try {
+        const [handle] = await showOpenFilePicker({
+            multiple: false,
+            // @ts-ignore startIn is available in browsers, but not in this adapter type definition
+            startIn: "downloads"
+        })
+
+        if (!handle) {
+            return null
+        }
+
+        return await handle.getFile()
+    } catch (e) {
+        if (e instanceof DOMException && e.name === "AbortError") {
+            return null
+        }
+        throw e
+    }
 }

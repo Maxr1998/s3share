@@ -1,0 +1,46 @@
+import {z} from "zod"
+import {FileMetadataSchema} from "./filemetadata"
+
+export type UploadPart = {
+    part: number
+    url: string
+}
+
+export const UploadCreateRequestSchema = z.object({
+    token: z.string().nonempty(),
+})
+
+export type UploadCreateRequest = z.infer<typeof UploadCreateRequestSchema>
+
+export const UploadCreateResponseSchema = z.object({
+    session_key: z.string().nonempty(),
+})
+
+export type UploadCreateResponse = z.infer<typeof UploadCreateResponseSchema>
+
+export const UploadPartsRequestSchema = z.object({
+    token: z.string().nonempty(),
+    session_key: z.string().nonempty(),
+    part: z.number().positive().default(1),
+    count: z.number().positive().max(50).default(1),
+}).refine(req => req.part + req.count - 1 <= 10000, {
+    message: "You can only request up to 10,000 parts in total.",
+    path: ["part", "count"],
+})
+
+export type UploadPartsRequest = z.infer<typeof UploadPartsRequestSchema>
+
+export const UploadCompleteRequestSchema = z.object({
+    token: z.string().nonempty(),
+    session_key: z.string().nonempty(),
+    metadata: FileMetadataSchema,
+    etags: z.array(z.string()).max(10000),
+})
+
+export type UploadCompleteRequest = z.infer<typeof UploadCompleteRequestSchema>
+
+export const UploadCompleteResponseSchema = z.object({
+    file_id: z.string().nonempty(),
+})
+
+export type UploadCompleteResponse = z.infer<typeof UploadCompleteResponseSchema>

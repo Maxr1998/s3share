@@ -1,7 +1,8 @@
-import {base64ToUint8Array, uint8ArrayToHex} from "uint8array-extras"
+import {base64ToUint8Array, uint8ArrayToBase64, uint8ArrayToHex} from "uint8array-extras"
 import type {EncryptedValue} from "../../worker/api/encryptedvalue"
 import {FileDecryptor} from "./decryptor"
-import {importIv} from "./key"
+import {FileEncryptor} from "./encryptor"
+import {exportIv, generateIv, importIv} from "./key"
 
 export async function decrypt(value: EncryptedValue, key: CryptoKey): Promise<Uint8Array> {
     const encrypted = base64ToUint8Array(value.value)
@@ -10,9 +11,24 @@ export async function decrypt(value: EncryptedValue, key: CryptoKey): Promise<Ui
     return await decrypter.decrypt(encrypted)
 }
 
+export async function encrypt(value: Uint8Array<ArrayBufferLike>, key: CryptoKey): Promise<EncryptedValue> {
+    const iv = generateIv()
+    const encrypter = new FileEncryptor(key, iv)
+    const encrypted = await encrypter.encrypt(value)
+    return {
+        value: uint8ArrayToBase64(encrypted),
+        iv: exportIv(iv),
+    }
+}
+
 export async function decryptToString(value: EncryptedValue, key: CryptoKey): Promise<string> {
     const buf = await decrypt(value, key)
     return new TextDecoder().decode(buf)
+}
+
+export async function encryptFromString(value: string, key: CryptoKey): Promise<EncryptedValue> {
+    const buf = new TextEncoder().encode(value)
+    return await encrypt(buf, key)
 }
 
 export async function decryptToHex(value: EncryptedValue, key: CryptoKey): Promise<string> {

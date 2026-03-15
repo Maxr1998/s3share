@@ -5,9 +5,7 @@ import type {FileInfo} from "../api/fileinfo"
 import type {FileMetadata} from "../api/filemetadata"
 import {getS3Client} from "../util/s3client"
 
-export async function download(url: URL): Promise<Response> {
-    const params = new URLSearchParams(url.search)
-
+export async function download(params: URLSearchParams): Promise<Response> {
     const fileId = params.get('file')
     if (fileId === null) {
         return new Response(null, {
