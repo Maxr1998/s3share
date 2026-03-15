@@ -1,4 +1,4 @@
-import {showSaveFilePicker} from "native-file-system-adapter";
+import {showSaveFilePicker} from "native-file-system-adapter"
 
 /**
  * Create a file readable stream from a file picker
@@ -23,6 +23,6 @@ export async function createDownloadWritableStream(filename: string, filesize: n
 
     return handle.createWritable({
         // @ts-ignore
-        size: filesize
+        size: filesize,
     })
 }

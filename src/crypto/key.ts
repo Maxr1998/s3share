@@ -1,5 +1,5 @@
-import {base64ToUint8Array} from "uint8array-extras";
-import {bufToBn} from "../utils/conversion";
+import {base64ToUint8Array} from "uint8array-extras"
+import {bufToBn} from "../utils/conversion"
 
 const subtle = window.crypto.subtle
 
@@ -10,7 +10,7 @@ export function importKey(key: string): Promise<CryptoKey> {
         rawKey,
         {name: "AES-CTR"},
         false,
-        ["encrypt", "decrypt"]
+        ["encrypt", "decrypt"],
     )
 }
 

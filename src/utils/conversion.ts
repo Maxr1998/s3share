@@ -12,7 +12,7 @@ export function bufToBn(buf: ArrayBuffer): bigint {
     const view = new DataView(buf)
     const length = view.byteLength
     if (length == 0) {
-        return 0n;
+        return 0n
     }
 
     let res = 0n

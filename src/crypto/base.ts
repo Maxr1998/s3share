@@ -1,5 +1,5 @@
-import {AES_BLOCK_SIZE, COUNTER_BITS} from "./constants";
-import {bnToUint8Array} from "../utils/conversion";
+import {bnToUint8Array} from "../utils/conversion"
+import {AES_BLOCK_SIZE, COUNTER_BITS} from "./constants"
 
 export abstract class AesCtrBase {
     readonly key: CryptoKey

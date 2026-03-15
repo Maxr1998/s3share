@@ -1,8 +1,8 @@
-import {isUint8Array} from "uint8array-extras";
-import type {ProgressTracker} from "./progress";
-import {FETCH_FAILED} from "../constants";
-import {FileDecryptor} from "../crypto/decryptor";
-import {AES_BLOCK_SIZE} from "../crypto/constants";
+import {isUint8Array} from "uint8array-extras"
+import {FETCH_FAILED} from "../constants"
+import {AES_BLOCK_SIZE} from "../crypto/constants"
+import {FileDecryptor} from "../crypto/decryptor"
+import type {ProgressTracker} from "./progress"
 
 interface BufferedTransformer<I = any, O = any> extends Transformer<I, O> {
     buffer?: Uint8Array | null
@@ -52,18 +52,18 @@ export async function streamDownloadDecryptToDisk(url: string,
         },
         async flush(controller) {
             if (this.buffer && this.buffer.length > 0) {
-                controller.enqueue(await fileDecrypter.decrypt(this.buffer));
+                controller.enqueue(await fileDecrypter.decrypt(this.buffer))
             }
-        }
+        },
     }
 
     const transformStream = new TransformStream(
         transformer,
         new ByteLengthQueuingStrategy({
-            highWaterMark: 1 << 20
+            highWaterMark: 1 << 20,
         }),
         new ByteLengthQueuingStrategy({
-            highWaterMark: 1 << 20
+            highWaterMark: 1 << 20,
         }),
     )
 

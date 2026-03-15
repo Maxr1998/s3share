@@ -1,4 +1,4 @@
-import {AesCtrBase} from "./base";
+import {AesCtrBase} from "./base"
 
 const subtle = window.crypto.subtle
 

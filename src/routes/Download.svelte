@@ -80,14 +80,14 @@
 </style>
 
 <script lang="ts">
-    import {DownloadInfo, loadDownloadInfo} from "../api";
-    import {onMount} from "svelte";
-    import {ProgressTracker} from "../utils/progress";
-    import {streamDownloadDecryptToDisk} from "../utils/stream";
-    import prettyBytes from "pretty-bytes";
-    import {createDownloadWritableStream} from "../utils/file";
-    import {DownloadState} from "../constants";
-    import {FileDecryptor} from "../crypto/decryptor";
+    import {DownloadInfo, loadDownloadInfo} from "../api"
+    import {onMount} from "svelte"
+    import {ProgressTracker} from "../utils/progress"
+    import {streamDownloadDecryptToDisk} from "../utils/stream"
+    import prettyBytes from "pretty-bytes"
+    import {createDownloadWritableStream} from "../utils/file"
+    import {DownloadState} from "../constants"
+    import {FileDecryptor} from "../crypto/decryptor"
 
     let error = $state()
     let downloadInfo = $state<DownloadInfo>()

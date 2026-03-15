@@ -1,9 +1,9 @@
-import {env} from "cloudflare:workers"
-import {getS3Client} from "../util/s3client"
 import {GetObjectCommand} from "@aws-sdk/client-s3"
 import {getSignedUrl} from "@aws-sdk/s3-request-presigner"
+import {env} from "cloudflare:workers"
 import type {FileInfo} from "../api/fileinfo"
 import type {FileMetadata} from "../api/filemetadata"
+import {getS3Client} from "../util/s3client"
 
 export async function download(url: URL): Promise<Response> {
     const params = new URLSearchParams(url.search)

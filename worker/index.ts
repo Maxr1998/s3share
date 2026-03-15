@@ -12,5 +12,5 @@ export default {
                     statusText: 'Not Found',
                 })
         }
-    }
+    },
 }
