@@ -10,14 +10,16 @@ export class DownloadInfo {
     size: number
     key: CryptoKey
     iv: bigint
+    lastModified?: Date
 
-    constructor(name: string, checksums: Map<string, string>, url: string, size: number, key: CryptoKey, iv: bigint) {
+    constructor(name: string, checksums: Map<string, string>, url: string, size: number, key: CryptoKey, iv: bigint, lastModified?: Date) {
         this.name = name
         this.checksums = checksums
         this.url = url
         this.size = size
         this.key = key
         this.iv = iv
+        this.lastModified = lastModified
     }
 }
 
@@ -46,7 +48,8 @@ export async function loadDownloadInfo(): Promise<DownloadInfo> {
     const name = await decryptToString(fileInfo.metadata.name, key)
     const checksums = await decryptChecksums(fileInfo, key)
     const iv = importIv(fileInfo.metadata.iv)
-    return new DownloadInfo(name, checksums, fileInfo.url, fileInfo.metadata.size, key, iv)
+    const lastModified = fileInfo.last_modified ? new Date(fileInfo.last_modified) : undefined
+    return new DownloadInfo(name, checksums, fileInfo.url, fileInfo.metadata.size, key, iv, lastModified)
 }
 
 async function decryptChecksums(fileInfo: FileInfo, key: CryptoKey): Promise<Map<string, string>> {

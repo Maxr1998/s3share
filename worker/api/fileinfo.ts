@@ -8,6 +8,7 @@ export const FileInfoSchema = z.object({
      * Pre-signed URL to download the file.
      */
     url: z.string(),
+    last_modified: z.iso.datetime().optional(),
 })
 
 /**
