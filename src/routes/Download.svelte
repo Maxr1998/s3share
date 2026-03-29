@@ -13,13 +13,9 @@
         {#if downloading === DownloadState.Idle}
             <button type="button" onclick="{download}">Download</button>
         {:else if downloading === DownloadState.Downloading}
-            <div class="progress-bar-track">
-                <div class="progress-bar-fill" style="width: {downloadProgress}%"></div>
+            <div class="progress-container">
+                <TransferProgress bytes={downloadBytes} total={downloadInfo.size} speed={downloadSpeed}/>
             </div>
-            <p class="download-status">
-                <span>{prettyBytes(downloadBytes, {fixedWidth: 8})} / {prettyBytes(downloadInfo.size)}</span>
-                {#if downloadSpeed > 0}<span> · {prettyBytes(downloadSpeed, {fixedWidth: 8})}/s</span>{/if}
-            </p>
         {:else if downloading === DownloadState.Completed}
             <p class="download-success">Successfully downloaded {downloadInfo.name}.</p>
         {:else if downloading === DownloadState.Failure}
@@ -111,30 +107,8 @@
         cursor: pointer;
     }
 
-    .progress-bar-track {
+    .progress-container {
         margin-top: 2rem;
-        width: 100%;
-        height: 8px;
-        background: rgba(255, 255, 255, 0.1);
-        border-radius: 4px;
-        overflow: hidden;
-    }
-
-    .progress-bar-fill {
-        height: 100%;
-        background: var(--link-color);
-        border-radius: 4px;
-        transition: width 0.25s linear;
-    }
-
-    .download-status {
-        margin-top: 0.5rem;
-        font-size: 0.9rem;
-        opacity: 0.55;
-    }
-
-    .download-status span {
-        white-space: pre-wrap;
     }
 
     .download-success {
@@ -151,6 +125,7 @@
     import prettyBytes from "pretty-bytes"
     import {onMount} from "svelte"
     import {DownloadInfo, loadDownloadInfo} from "../api"
+    import TransferProgress from "../components/TransferProgress.svelte"
     import {DownloadState} from "../constants"
     import {FileDecryptor} from "../crypto/decryptor"
     import {createDownloadWritableStream} from "../utils/file"
@@ -173,7 +148,6 @@
     let downloading = $state(DownloadState.Idle)
 
     let downloadBytes = $state(0)
-    let downloadProgress = $state(0)
     let downloadSpeed = $state(0)
 
     onMount(async () => {
@@ -204,15 +178,13 @@
             const downloadOutputStream = await createDownloadWritableStream(info.name, info.size)
             const fileDecrypter = new FileDecryptor(info.key, info.iv)
 
-            // Reset download progress state
+            // Reset download state
             downloadBytes = 0
-            downloadProgress = 0
             downloadSpeed = 0
 
             const speedTracker = new SpeedTracker((speed) => downloadSpeed = speed)
             const progressTracker = new ProgressTracker(info.size, (progress) => {
                 downloadBytes = progress
-                downloadProgress = progress / info.size * 100
                 speedTracker.update(progress)
             })
             downloading = DownloadState.Downloading
