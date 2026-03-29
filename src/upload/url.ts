@@ -6,18 +6,20 @@ export type EncryptionKey = {
     keyString: string,
 }
 
-export async function getUploadToken(): Promise<string> {
+export function getUploadToken(): string {
+    const prefix = "/upload/"
+
     const path = window.location.pathname
-
-    if (!path) {
-        return Promise.reject(INVALID_UPLOAD_URL)
+    if (!path.startsWith(prefix)) {
+        throw new Error(INVALID_UPLOAD_URL)
     }
 
-    if (!path.startsWith("/upload/")) {
-        return Promise.reject(INVALID_UPLOAD_URL)
+    const token = path.slice(prefix.length) // strip /upload/
+    if (token.length === 0) {
+        throw new Error(INVALID_UPLOAD_URL)
     }
 
-    return path.slice(8) // strip /upload/
+    return token
 }
 
 export async function getEncryptionKey(): Promise<EncryptionKey> {

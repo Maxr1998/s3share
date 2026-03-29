@@ -103,7 +103,7 @@
                 speedTracker.update(progress)
             })
 
-            const uploadToken = await getUploadToken()
+            const uploadToken = getUploadToken()
             const encryptionKey = await getEncryptionKey()
 
             const uploadManager = new UploadManager(uploadToken, encryptionKey, file, progressTracker)
