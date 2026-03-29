@@ -1,5 +1,6 @@
 import {env} from "cloudflare:workers"
 import type {
+    SessionRequest,
     UploadCompleteRequest,
     UploadCompleteResponse,
     UploadCreateRequest,
@@ -17,7 +18,7 @@ export async function createUpload(request: UploadCreateRequest): Promise<Respon
         return textResponse(404, 'Not Found', ERROR_INVALID_SESSION)
     }
 
-    if (session.state !== State.Pending) {
+    if (session.state === State.InProgress) {
         const oldFileId = session.file_id
         if (!oldFileId) {
             return textResponse(500, 'Internal Server Error', ERROR_UNEXPECTED_SESSION_STATE)
@@ -29,7 +30,7 @@ export async function createUpload(request: UploadCreateRequest): Promise<Respon
 
         // Cancel current upload session
         await cancelMultipartUpload(oldFileId, oldUploadId).catch((e) => {
-            // Ignore and log errors, this is allowed to fail if the upload was already completed or cancelled
+            // Ignore and log errors, this is allowed to fail if the upload was already completed or canceled
             console.error('Failed to cancel multipart upload', e)
         })
     }
@@ -56,58 +57,24 @@ export async function createUpload(request: UploadCreateRequest): Promise<Respon
 }
 
 export async function generateUploadParts(request: UploadPartsRequest): Promise<Response> {
-    const session = await getUploadSession(request.token)
-    if (session === null) {
-        return textResponse(404, 'Not Found', ERROR_INVALID_SESSION)
+    const result = await validateUploadSessionInProgress(request)
+    if (result instanceof Response) {
+        return result
     }
 
-    if (session.session_key !== request.session_key) {
-        return textResponse(400, 'Bad Request', ERROR_INVALID_SESSION_KEY)
-    }
-
-    if (session.state !== State.InProgress) {
-        return textResponse(400, 'Bad Request', ERROR_UNEXPECTED_SESSION_STATE)
-    }
-
-    const fileId = session.file_id
-    if (!fileId) {
-        return textResponse(500, 'Internal Server Error', ERROR_UNEXPECTED_SESSION_STATE)
-    }
-
-    const uploadId = session.upload_id
-    if (!uploadId) {
-        return textResponse(500, 'Internal Server Error', ERROR_UNEXPECTED_SESSION_STATE)
-    }
-
+    const {fileId, uploadId} = result
     const parts = await generatePartUrls(fileId, uploadId, request.part, request.count)
 
     return Response.json(parts)
 }
 
 export async function completeUpload(request: UploadCompleteRequest): Promise<Response> {
-    const session = await getUploadSession(request.token)
-    if (session === null) {
-        return textResponse(404, 'Not Found', ERROR_INVALID_SESSION)
+    const result = await validateUploadSessionInProgress(request)
+    if (result instanceof Response) {
+        return result
     }
 
-    if (session.session_key !== request.session_key) {
-        return textResponse(400, 'Bad Request', ERROR_INVALID_SESSION_KEY)
-    }
-
-    if (session.state !== State.InProgress) {
-        return textResponse(400, 'Bad Request', ERROR_UNEXPECTED_SESSION_STATE)
-    }
-
-    const fileId = session.file_id
-    if (!fileId) {
-        return textResponse(500, 'Internal Server Error', ERROR_UNEXPECTED_SESSION_STATE)
-    }
-
-    const uploadId = session.upload_id
-    if (!uploadId) {
-        return textResponse(500, 'Internal Server Error', ERROR_UNEXPECTED_SESSION_STATE)
-    }
-
+    const {fileId, uploadId} = result
     await completeMultipartUpload(fileId, uploadId, request.etags)
 
     // Store metadata for uploaded file
@@ -121,6 +88,41 @@ export async function completeUpload(request: UploadCompleteRequest): Promise<Re
     }
 
     return Response.json(response)
+}
+
+type ValidatedUploadSession = {
+    fileId: string,
+    uploadId: string,
+}
+
+async function validateUploadSessionInProgress(request: SessionRequest): Promise<ValidatedUploadSession | Response> {
+    const session = await getUploadSession(request.token)
+    if (session === null) {
+        return textResponse(404, 'Not Found', ERROR_INVALID_SESSION)
+    }
+
+    if (session.session_key !== request.session_key) {
+        return textResponse(400, 'Bad Request', ERROR_INVALID_SESSION_KEY)
+    }
+
+    if (session.state !== State.InProgress) {
+        return textResponse(400, 'Bad Request', ERROR_UNEXPECTED_SESSION_STATE)
+    }
+
+    const fileId = session.file_id
+    if (!fileId) {
+        return textResponse(500, 'Internal Server Error', ERROR_UNEXPECTED_SESSION_STATE)
+    }
+
+    const uploadId = session.upload_id
+    if (!uploadId) {
+        return textResponse(500, 'Internal Server Error', ERROR_UNEXPECTED_SESSION_STATE)
+    }
+
+    return {
+        fileId: fileId,
+        uploadId: uploadId,
+    }
 }
 
 // Error messages

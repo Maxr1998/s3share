@@ -18,9 +18,14 @@ export const UploadCreateResponseSchema = z.object({
 
 export type UploadCreateResponse = z.infer<typeof UploadCreateResponseSchema>
 
-export const UploadPartsRequestSchema = z.object({
+export const SessionRequestSchema = z.object({
     token: z.string().nonempty(),
     session_key: z.string().nonempty(),
+})
+
+export type SessionRequest = z.infer<typeof SessionRequestSchema>
+
+export const UploadPartsRequestSchema = SessionRequestSchema.extend({
     part: z.int().positive().default(1),
     count: z.int().positive().max(50).default(1),
 }).refine(req => req.part + req.count - 1 <= 10000, {
@@ -30,9 +35,7 @@ export const UploadPartsRequestSchema = z.object({
 
 export type UploadPartsRequest = z.infer<typeof UploadPartsRequestSchema>
 
-export const UploadCompleteRequestSchema = z.object({
-    token: z.string().nonempty(),
-    session_key: z.string().nonempty(),
+export const UploadCompleteRequestSchema = SessionRequestSchema.extend({
     metadata: FileMetadataSchema,
     etags: z.array(z.string()).max(10000),
 })
