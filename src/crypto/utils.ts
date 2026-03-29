@@ -7,7 +7,7 @@ export async function decrypt(value: EncryptedValue, key: CryptoKey): Promise<Ui
     const encrypted = base64ToUint8Array(value.value)
     const iv = importIv(value.iv)
     const decrypter = new FileDecryptor(key, iv)
-    return await decrypter.decrypt(encrypted)
+    return await decrypter.decryptFinal(encrypted)
 }
 
 export async function decryptToString(value: EncryptedValue, key: CryptoKey): Promise<string> {

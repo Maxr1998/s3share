@@ -51,8 +51,9 @@ export async function streamDownloadDecryptToDisk(url: string,
             }
         },
         async flush(controller) {
-            if (this.buffer && this.buffer.length > 0) {
-                controller.enqueue(await fileDecrypter.decrypt(this.buffer))
+            const result = await fileDecrypter.decryptFinal(this.buffer ?? new Uint8Array(0))
+            if (result.byteLength > 0) {
+                controller.enqueue(result)
             }
         },
     }

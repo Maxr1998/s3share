@@ -7,6 +7,7 @@ export abstract class AesCtrBase {
     private counter: bigint
     private readonly counterArray: Uint8Array<ArrayBuffer>
     protected readonly params: AesCtrParams
+    private isFinalized = false
 
     constructor(key: CryptoKey, iv: bigint) {
         this.key = key
@@ -24,7 +25,20 @@ export abstract class AesCtrBase {
     }
 
     protected incrementCounter(bytes: number) {
-        this.counter = this.counter + BigInt(Math.floor(bytes / AES_BLOCK_SIZE))
+        if (this.isFinalized) {
+            throw new Error("Instance has already been finalized")
+        }
+        if (bytes % AES_BLOCK_SIZE !== 0) {
+            throw new Error("Data must be AES block-aligned for non-final operations")
+        }
+        this.counter += BigInt(bytes / AES_BLOCK_SIZE)
         bnToUint8Array(this.counter, this.counterArray)
+    }
+
+    protected finalize() {
+        if (this.isFinalized) {
+            throw new Error("Instance has already been finalized")
+        }
+        this.isFinalized = true
     }
 }
