@@ -156,6 +156,7 @@
     import {createDownloadWritableStream} from "../utils/file"
     import {DownloadState} from "../constants"
     import {FileDecryptor} from "../crypto/decryptor"
+    import {SpeedTracker} from "../utils/speed"
 
     const THRESHOLDS: [Intl.RelativeTimeFormatUnit, number][] = [
         ['second', 60],
@@ -208,21 +209,11 @@
             downloadProgress = 0
             downloadSpeed = 0
 
-            let lastTime = Date.now()
-            let lastBytes = 0
+            const speedTracker = new SpeedTracker((speed) => downloadSpeed = speed)
             const progressTracker = new ProgressTracker(info.size, (progress) => {
                 downloadBytes = progress
                 downloadProgress = progress / info.size * 100
-
-                const now = Date.now()
-                const dt = (now - lastTime) / 1000
-                if (dt >= 0.25) {
-                    const instant = (progress - lastBytes) / dt
-                    // Use exponential moving average for download speed
-                    downloadSpeed = downloadSpeed === 0 ? instant : downloadSpeed * 0.7 + instant * 0.3
-                    lastTime = now
-                    lastBytes = progress
-                }
+                speedTracker.update(progress)
             })
             downloading = DownloadState.Downloading
             await streamDownloadDecryptToDisk(info.url, fileDecrypter, downloadOutputStream, progressTracker)
