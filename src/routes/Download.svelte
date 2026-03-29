@@ -148,15 +148,15 @@
 </style>
 
 <script lang="ts">
-    import {DownloadInfo, loadDownloadInfo} from "../api"
-    import {onMount} from "svelte"
-    import {ProgressTracker} from "../utils/progress"
-    import {streamDownloadDecryptToDisk} from "../utils/stream"
     import prettyBytes from "pretty-bytes"
-    import {createDownloadWritableStream} from "../utils/file"
+    import {onMount} from "svelte"
+    import {DownloadInfo, loadDownloadInfo} from "../api"
     import {DownloadState} from "../constants"
     import {FileDecryptor} from "../crypto/decryptor"
+    import {createDownloadWritableStream} from "../utils/file"
+    import {ProgressTracker} from "../utils/progress"
     import {SpeedTracker} from "../utils/speed"
+    import {streamDownloadDecryptToDisk} from "../utils/stream"
 
     const THRESHOLDS: [Intl.RelativeTimeFormatUnit, number][] = [
         ['second', 60],
