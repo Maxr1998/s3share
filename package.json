@@ -8,7 +8,8 @@
     "build": "vite build",
     "preview": "vite preview",
     "generate-types": "wrangler types",
-    "check": "svelte-check --tsconfig ./tsconfig.json && tsc -p tsconfig.node.json"
+    "check": "svelte-check --tsconfig ./tsconfig.json && tsc -p tsconfig.node.json",
+    "deploy": "vite build && wrangler deploy"
   },
   "devDependencies": {
     "@cloudflare/vite-plugin": "^1.28.0",
