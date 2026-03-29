@@ -7,6 +7,7 @@ import type {
     UploadPart,
     UploadPartsRequest,
 } from "../../worker/api/upload"
+import {INVALID_UPLOAD_URL} from "../constants"
 import {post} from "../request"
 
 export async function prepareUpload(uploadToken: string): Promise<string> {
@@ -14,6 +15,7 @@ export async function prepareUpload(uploadToken: string): Promise<string> {
         token: uploadToken,
     }
     const response = await post("/upload/create", request)
+    if (!response.ok) return Promise.reject(INVALID_UPLOAD_URL)
 
     const uploadCreateResponse: UploadCreateResponse = await response.json()
     return uploadCreateResponse.session_key
@@ -32,6 +34,7 @@ export async function requestParts(
         count: partCount,
     }
     const response = await post("/upload/parts", request)
+    if (!response.ok) return Promise.reject(INVALID_UPLOAD_URL)
 
     return await response.json()
 }
@@ -49,6 +52,7 @@ export async function completeUpload(
         etags: etags,
     }
     const response = await post("/upload/complete", request)
+    if (!response.ok) return Promise.reject(INVALID_UPLOAD_URL)
 
     return await response.json()
 }
