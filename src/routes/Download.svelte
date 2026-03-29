@@ -13,9 +13,15 @@
         {#if downloading === DownloadState.Idle}
             <button type="button" onclick="{download}">Download</button>
         {:else if downloading === DownloadState.Downloading}
-            <p class="download-status">Downloading...{downloadProgress}</p>
+            <div class="progress-bar-track">
+                <div class="progress-bar-fill" style="width: {downloadProgress}%"></div>
+            </div>
+            <p class="download-status">
+                <span>{prettyBytes(downloadBytes, {fixedWidth: 8})} / {prettyBytes(downloadInfo.size)}</span>
+                {#if downloadSpeed > 0}<span> · {prettyBytes(downloadSpeed, {fixedWidth: 8})}/s</span>{/if}
+            </p>
         {:else if downloading === DownloadState.Completed}
-            <p class="download-status">Successfully downloaded {downloadInfo.name}.</p>
+            <p class="download-success">Successfully downloaded {downloadInfo.name}.</p>
         {:else if downloading === DownloadState.Failure}
             <p class="error">Download failed</p>
             <button type="button" onclick="{() => downloading = DownloadState.Idle}">Retry</button>
@@ -105,7 +111,33 @@
         cursor: pointer;
     }
 
+    .progress-bar-track {
+        margin-top: 2rem;
+        width: 100%;
+        height: 8px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 4px;
+        overflow: hidden;
+    }
+
+    .progress-bar-fill {
+        height: 100%;
+        background: var(--link-color);
+        border-radius: 4px;
+        transition: width 0.25s linear;
+    }
+
     .download-status {
+        margin-top: 0.5rem;
+        font-size: 0.9rem;
+        opacity: 0.55;
+    }
+
+    .download-status span {
+        white-space: pre-wrap;
+    }
+
+    .download-success {
         margin-top: 2rem;
     }
 
@@ -138,7 +170,10 @@
     let error = $state()
     let downloadInfo = $state<DownloadInfo>()
     let downloading = $state(DownloadState.Idle)
-    let downloadProgress = $state('')
+
+    let downloadBytes = $state(0)
+    let downloadProgress = $state(0)
+    let downloadSpeed = $state(0)
 
     onMount(async () => {
         try {
@@ -167,8 +202,27 @@
         try {
             const downloadOutputStream = await createDownloadWritableStream(info.name, info.size)
             const fileDecrypter = new FileDecryptor(info.key, info.iv)
-            const progressTracker = new ProgressTracker(info.size, (progress, total) => {
-                downloadProgress = ` (${prettyBytes(progress)} / ${prettyBytes(total)})`
+
+            // Reset download progress state
+            downloadBytes = 0
+            downloadProgress = 0
+            downloadSpeed = 0
+
+            let lastTime = Date.now()
+            let lastBytes = 0
+            const progressTracker = new ProgressTracker(info.size, (progress) => {
+                downloadBytes = progress
+                downloadProgress = progress / info.size * 100
+
+                const now = Date.now()
+                const dt = (now - lastTime) / 1000
+                if (dt >= 0.25) {
+                    const instant = (progress - lastBytes) / dt
+                    // Use exponential moving average for download speed
+                    downloadSpeed = downloadSpeed === 0 ? instant : downloadSpeed * 0.7 + instant * 0.3
+                    lastTime = now
+                    lastBytes = progress
+                }
             })
             downloading = DownloadState.Downloading
             await streamDownloadDecryptToDisk(info.url, fileDecrypter, downloadOutputStream, progressTracker)
