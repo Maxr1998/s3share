@@ -4,11 +4,11 @@ export const EncryptedValueSchema = z.object({
     /**
      * base64-encoded ciphertext of the value.
      */
-    value: z.string(),
+    value: z.base64(),
     /**
      * base64-encoded initialization vector.
      */
-    iv: z.string(),
+    iv: z.base64().nonempty(),
 })
 
 /**

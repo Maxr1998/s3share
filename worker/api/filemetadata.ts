@@ -15,7 +15,7 @@ export const FileMetadataSchema = z.object({
     /**
      * base64-encoded initialization vector used to encrypt the file.
      */
-    iv: z.string(),
+    iv: z.base64().nonempty(),
     /**
      * Size of the file in bytes.
      */

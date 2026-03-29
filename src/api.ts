@@ -1,5 +1,6 @@
 import type {EncryptedValue} from "../worker/api/encryptedvalue"
 import type {FileInfo} from "../worker/api/fileinfo"
+import {INVALID_KEY} from "./constants"
 import {importIv, importKey} from "./crypto/key"
 import {decryptToHex, decryptToString} from "./crypto/utils"
 
@@ -24,7 +25,6 @@ export class DownloadInfo {
 }
 
 const FILE_NOT_FOUND = "Invalid URL - the link you are trying to access does not exist."
-const INVALID_KEY = "Invalid decryption key - please ensure you copied the full, correct link."
 
 export async function loadDownloadInfo(): Promise<DownloadInfo> {
     const path = window.location.pathname

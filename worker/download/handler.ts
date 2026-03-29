@@ -10,9 +10,7 @@ type ObjectMetadata = {
     lastModified?: Date,
 }
 
-export async function download(url: URL): Promise<Response> {
-    const params = new URLSearchParams(url.search)
-
+export async function download(params: URLSearchParams): Promise<Response> {
     const fileId = params.get('file')
     if (fileId === null) {
         return new Response(null, {
