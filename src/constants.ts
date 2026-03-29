@@ -20,7 +20,7 @@ export enum DownloadState {
  */
 export type UploadState =
     | { type: 'Loading' }
-    | { type: 'Idle' } & WithTokenAndKey
+    | { type: 'Idle', inProgress?: boolean } & WithTokenAndKey
     | { type: 'Preparing' } & WithTokenAndKey & WithFile
     | { type: 'Uploading' } & WithTokenAndKey & WithFile
     | { type: 'Completed' }

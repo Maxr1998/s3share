@@ -15,6 +15,7 @@
     --button-color: #1a1a1a;
     --chip-color: #101010;
     --error-color: #ff4d4d;
+    --warning-color: orange;
 
     color-scheme: light dark;
     color: var(--foreground-color);
@@ -92,6 +93,10 @@ button:focus-visible {
 
 .error {
     color: var(--error-color);
+}
+
+.warning {
+    color: var(--warning-color);
 }
 
 p.error {

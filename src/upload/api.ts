@@ -1,5 +1,7 @@
 import type {FileMetadata} from "../../worker/api/filemetadata"
 import type {
+    CheckUploadTokenRequest,
+    CheckUploadTokenResponse,
     UploadCompleteRequest,
     UploadCompleteResponse,
     UploadCreateRequest,
@@ -9,6 +11,21 @@ import type {
 } from "../../worker/api/upload"
 import {INVALID_UPLOAD_URL} from "../constants"
 import {post} from "../request"
+
+type UploadTokenValidationResult =
+    | { valid: true, inProgress: boolean }
+    | { valid: false }
+
+export async function checkUploadToken(uploadToken: string): Promise<UploadTokenValidationResult> {
+    const request: CheckUploadTokenRequest = {
+        token: uploadToken,
+    }
+    const response = await post("/upload/check", request)
+    if (!response.ok) return {valid: false}
+
+    const checkUploadTokenResponse: CheckUploadTokenResponse = await response.json()
+    return {valid: true, inProgress: checkUploadTokenResponse.in_progress}
+}
 
 export async function prepareUpload(uploadToken: string): Promise<string> {
     const request: UploadCreateRequest = {

@@ -1,5 +1,7 @@
 import {env} from "cloudflare:workers"
 import type {
+    CheckUploadTokenRequest,
+    CheckUploadTokenResponse,
     SessionRequest,
     UploadCompleteRequest,
     UploadCompleteResponse,
@@ -11,6 +13,17 @@ import {generateFileId} from "../util/fileid"
 import {textResponse} from "../util/response"
 import {cancelMultipartUpload, completeMultipartUpload, generatePartUrls, initiateMultipartUpload} from "./multipart"
 import {getUploadSession, State} from "./session"
+
+export async function checkUploadSession(request: CheckUploadTokenRequest): Promise<Response> {
+    const session = await getUploadSession(request.token)
+    if (session === null) {
+        return textResponse(404, 'Not Found', ERROR_INVALID_SESSION)
+    }
+    const response: CheckUploadTokenResponse = {
+        in_progress: session.state === State.InProgress,
+    }
+    return Response.json(response)
+}
 
 export async function createUpload(request: UploadCreateRequest): Promise<Response> {
     const session = await getUploadSession(request.token)

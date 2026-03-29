@@ -1,6 +1,11 @@
-import {UploadCompleteRequestSchema, UploadCreateRequestSchema, UploadPartsRequestSchema} from "./api/upload"
+import {
+    CheckUploadTokenRequestSchema,
+    UploadCompleteRequestSchema,
+    UploadCreateRequestSchema,
+    UploadPartsRequestSchema,
+} from "./api/upload"
 import {download} from "./download/handler"
-import {completeUpload, createUpload, generateUploadParts} from "./upload/handler"
+import {checkUploadSession, completeUpload, createUpload, generateUploadParts} from "./upload/handler"
 import {handlePostJson, hasMethod} from "./util/request"
 import {methodNotAllowed} from "./util/response"
 
@@ -13,15 +18,14 @@ export default {
                     return methodNotAllowed('GET')
                 }
                 return await download(url.searchParams)
-            case '/upload/create': {
+            case '/upload/check':
+                return await handlePostJson(request, CheckUploadTokenRequestSchema, checkUploadSession)
+            case '/upload/create':
                 return await handlePostJson(request, UploadCreateRequestSchema, createUpload)
-            }
-            case '/upload/parts': {
+            case '/upload/parts':
                 return await handlePostJson(request, UploadPartsRequestSchema, generateUploadParts)
-            }
-            case '/upload/complete': {
+            case '/upload/complete':
                 return await handlePostJson(request, UploadCompleteRequestSchema, completeUpload)
-            }
             default:
                 return new Response('Not Found', {
                     status: 404,

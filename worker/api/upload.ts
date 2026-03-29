@@ -6,9 +6,21 @@ export type UploadPart = {
     url: string
 }
 
-export const UploadCreateRequestSchema = z.object({
+const UploadTokenRequestSchema = z.object({
     token: z.string().nonempty(),
 })
+
+export const CheckUploadTokenRequestSchema = UploadTokenRequestSchema
+
+export type CheckUploadTokenRequest = z.infer<typeof CheckUploadTokenRequestSchema>
+
+export const CheckUploadTokenResponseSchema = z.object({
+    in_progress: z.boolean(),
+})
+
+export type CheckUploadTokenResponse = z.infer<typeof CheckUploadTokenResponseSchema>
+
+export const UploadCreateRequestSchema = UploadTokenRequestSchema
 
 export type UploadCreateRequest = z.infer<typeof UploadCreateRequestSchema>
 
@@ -18,8 +30,7 @@ export const UploadCreateResponseSchema = z.object({
 
 export type UploadCreateResponse = z.infer<typeof UploadCreateResponseSchema>
 
-export const SessionRequestSchema = z.object({
-    token: z.string().nonempty(),
+export const SessionRequestSchema = UploadTokenRequestSchema.extend({
     session_key: z.string().nonempty(),
 })
 

@@ -4,6 +4,9 @@
             Upload a file to share it securely.
             Your file will be encrypted locally and the server will never see its contents.
         </p>
+        {#if uploadState.inProgress}
+            <p class="in-progress-hint warning">An upload is already in progress. Starting a new upload will replace it.</p>
+        {/if}
         <button type="button" onclick="{initiateUpload}">Choose file</button>
     {:else if uploadState.type === "Preparing"}
         <p class="status-header">Preparing to upload {uploadState.file.name}…</p>
@@ -33,6 +36,10 @@
         opacity: 0.55;
     }
 
+    .in-progress-hint {
+        margin-top: 0.5rem;
+    }
+
     .status-header {
         font-size: 1.25rem;
         font-weight: 600;
@@ -52,20 +59,26 @@
         opacity: 0.55;
     }
 
+    .error-message {
+        margin-top: 0.5rem;
+    }
+
     .error {
         font-size: 1.25rem;
         font-weight: 600;
     }
 
-    .error-message {
-        margin-top: 0.5rem;
+    .warning {
+        font-size: 0.9rem;
+        font-weight: 500;
     }
 </style>
 
 <script lang="ts">
     import {onMount} from "svelte"
     import TransferProgress from "../components/TransferProgress.svelte"
-    import {type UploadState} from "../constants"
+    import {INVALID_UPLOAD_URL, type UploadState} from "../constants"
+    import {checkUploadToken} from "../upload/api"
     import {UploadManager} from "../upload/manager"
     import {getEncryptionKey, getUploadToken} from "../upload/url"
     import {pickUploadFile} from "../utils/file"
@@ -84,7 +97,13 @@
             const token = getUploadToken()
             const key = await getEncryptionKey()
 
-            uploadState = {type: "Idle", token, key}
+            const uploadTokenResponse = await checkUploadToken(token)
+            if (!uploadTokenResponse.valid) {
+                uploadState = {type: "InvalidToken", error: new Error(INVALID_UPLOAD_URL)}
+                return
+            }
+
+            uploadState = {type: "Idle", token, key, inProgress: uploadTokenResponse.inProgress}
         } catch (e) {
             console.error(e)
             uploadState = {type: "InvalidToken", error: e}
