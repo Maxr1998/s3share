@@ -7,7 +7,7 @@
         {#if uploadState.inProgress}
             <p class="in-progress-hint warning">An upload is already in progress. Starting a new upload will replace it.</p>
         {/if}
-        <button type="button" onclick="{initiateUpload}">Choose file</button>
+        <button type="button" onclick="{onSelectFile}">Choose file</button>
     {:else if uploadState.type === "Preparing"}
         <p class="status-header">Preparing to upload {uploadState.file.name}…</p>
     {:else if uploadState.type === "Uploading"}
@@ -28,6 +28,8 @@
     {:else if uploadState.type === "InvalidToken"}
         <p class="error">Invalid upload URL</p>
     {/if}
+
+    <FileDrop enabled={uploadState.type === "Idle"} onDrop={startUploadWithFile}/>
 </div>
 
 <style>
@@ -76,6 +78,7 @@
 
 <script lang="ts">
     import {onMount} from "svelte"
+    import FileDrop from "../components/FileDrop.svelte"
     import TransferProgress from "../components/TransferProgress.svelte"
     import {INVALID_UPLOAD_URL, type UploadState} from "../constants"
     import {checkUploadToken} from "../upload/api"
@@ -110,16 +113,25 @@
         }
     })
 
-    async function initiateUpload() {
+    async function onSelectFile() {
+        if (uploadState.type !== "Idle") {
+            console.error("Upload already in progress")
+            return
+        }
+
+        const file = await pickUploadFile()
+        if (!file) return
+
+        await startUploadWithFile(file)
+    }
+
+    async function startUploadWithFile(file: File) {
         // Ensure we're idle before allowing to pick a file
         if (uploadState.type !== "Idle") return
 
         // Store token and key for the current session
         const uploadToken = uploadState.token
         const encryptionKey = uploadState.key
-
-        const file = await pickUploadFile()
-        if (!file) return
 
         uploadState = {type: "Preparing", token: uploadToken, key: encryptionKey, file}
 
