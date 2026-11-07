@@ -45,7 +45,15 @@ To set it up:
     - `ACCESS_AUD_TAG`: The Application Audience (AUD) tag of the Cloudflare Access application.
     - `ACCESS_ADMIN_EMAIL`: The email address of the admin, as shown by `/cdn-cgi/access/get-identity`.
 
-## Uploading files
+## Uploading and managing files
 
-A command-line upload tool is available in a separate repository:
-[s3share-cli](https://github.com/Maxr1998/s3share-cli).
+Files can be uploaded through upload URLs, which can be created in the [admin interface](#admin-interface)
+and shared with anyone who should be able to upload a file.
+
+The command-line tool [s3share-cli](https://github.com/Maxr1998/s3share-cli) offers additional ways
+to manage the files from a terminal:
+
+- Upload files directly, without the need for an upload URL
+- Download files without the web interface
+- List and delete uploaded files
+- Create upload URLs
