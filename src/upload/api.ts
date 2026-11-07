@@ -20,7 +20,7 @@ export async function checkUploadToken(uploadToken: string): Promise<UploadToken
     const request: CheckUploadTokenRequest = {
         token: uploadToken,
     }
-    const response = await post("/upload/check", request)
+    const response = await post("/api/upload/check", request)
     if (!response.ok) return {valid: false}
 
     const checkUploadTokenResponse: CheckUploadTokenResponse = await response.json()
@@ -31,7 +31,7 @@ export async function prepareUpload(uploadToken: string): Promise<string> {
     const request: UploadCreateRequest = {
         token: uploadToken,
     }
-    const response = await post("/upload/create", request)
+    const response = await post("/api/upload/create", request)
     if (!response.ok) return Promise.reject(INVALID_UPLOAD_URL)
 
     const uploadCreateResponse: UploadCreateResponse = await response.json()
@@ -50,7 +50,7 @@ export async function requestParts(
         part: partIndex,
         count: partCount,
     }
-    const response = await post("/upload/parts", request)
+    const response = await post("/api/upload/parts", request)
     if (!response.ok) return Promise.reject(INVALID_UPLOAD_URL)
 
     return await response.json()
@@ -68,7 +68,7 @@ export async function completeUpload(
         metadata: fileMetadata,
         etags: etags,
     }
-    const response = await post("/upload/complete", request)
+    const response = await post("/api/upload/complete", request)
     if (!response.ok) return Promise.reject(INVALID_UPLOAD_URL)
 
     return await response.json()

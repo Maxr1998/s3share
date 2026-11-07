@@ -13,18 +13,18 @@ export default {
     async fetch(request: Request): Promise<Response> {
         const url = new URL(request.url)
         switch (url.pathname) {
-            case '/download':
+            case '/api/download':
                 if (!hasMethod(request, 'GET')) {
                     return methodNotAllowed('GET')
                 }
                 return await download(url.searchParams)
-            case '/upload/check':
+            case '/api/upload/check':
                 return await handlePostJson(request, CheckUploadTokenRequestSchema, checkUploadSession)
-            case '/upload/create':
+            case '/api/upload/create':
                 return await handlePostJson(request, UploadCreateRequestSchema, createUpload)
-            case '/upload/parts':
+            case '/api/upload/parts':
                 return await handlePostJson(request, UploadPartsRequestSchema, generateUploadParts)
-            case '/upload/complete':
+            case '/api/upload/complete':
                 return await handlePostJson(request, UploadCompleteRequestSchema, completeUpload)
             default:
                 return new Response('Not Found', {

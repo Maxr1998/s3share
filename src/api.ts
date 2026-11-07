@@ -38,7 +38,7 @@ export async function loadDownloadInfo(): Promise<DownloadInfo> {
     const key = await importKey(keyString).catch(() => Promise.reject(INVALID_KEY))
 
     // Fetch file info
-    const fileInfo: FileInfo = await fetch(`/download?file=${fileId}`).then((response) => {
+    const fileInfo: FileInfo = await fetch(`/api/download?file=${fileId}`).then((response) => {
         if (!response.ok) {
             return Promise.reject(FILE_NOT_FOUND)
         }
