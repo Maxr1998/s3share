@@ -32,6 +32,7 @@
                         </div>
                         <div class="checksum-col">
                             <span class="checksum"
+                                  title={checksum}
                                   onclick="{() => copyToClipboard(checksum)}"
                                   onkeydown="{(e) => {e.key === 'Enter' && copyToClipboard(checksum)}}"
                                   role="button"
