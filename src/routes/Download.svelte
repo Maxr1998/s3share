@@ -50,6 +50,7 @@
     .filename {
         font-size: 1.25rem;
         font-weight: 600;
+        overflow-wrap: anywhere;
     }
 
     .meta {
@@ -76,6 +77,7 @@
     }
 
     .checksum-container {
+        max-width: 100%;
         display: inline-grid;
         grid-template-columns: auto 1fr;
         grid-column-gap: 4px;
@@ -85,6 +87,7 @@
     }
 
     .checksum-col {
+        min-width: 0;
         text-align: left;
     }
 
@@ -104,6 +107,12 @@
 
     .checksum {
         display: inline-block;
+        max-width: 100%;
+        box-sizing: border-box;
+        vertical-align: top;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
         cursor: pointer;
     }
 
