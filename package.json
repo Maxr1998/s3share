@@ -15,12 +15,12 @@
     "@cloudflare/vite-plugin": "^1.30.2",
     "@sveltejs/vite-plugin-svelte": "^6.2.4",
     "@tsconfig/svelte": "^5.0.8",
-    "@types/node": "^25.5.0",
+    "@types/node": "^26.6.6",
     "svelte": "^5.55.0",
     "svelte-check": "^4.4.5",
     "typescript": "^6.0.2",
     "vite": "^7.3.1",
-    "wrangler": "^4.78.0"
+    "wrangler": "^4.158.0"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1019.0",
