@@ -1,3 +1,7 @@
+<svelte:head>
+    <title>Admin - S3share</title>
+</svelte:head>
+
 <div>
     {#if error}
         <p class="error">{error}</p>

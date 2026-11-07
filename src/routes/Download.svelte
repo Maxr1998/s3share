@@ -1,3 +1,7 @@
+<svelte:head>
+    <title>{downloadInfo ? `${downloadInfo.name} - S3share` : "S3share - download files securely"}</title>
+</svelte:head>
+
 <div>
     {#if error}
         <p class="error">{error}</p>

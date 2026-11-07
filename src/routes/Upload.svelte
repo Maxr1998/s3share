@@ -1,3 +1,7 @@
+<svelte:head>
+    <title>Upload file - S3share</title>
+</svelte:head>
+
 <div>
     {#if uploadState.type === "Idle"}
         <p class="description">
