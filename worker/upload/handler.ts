@@ -1,5 +1,7 @@
 import {env} from "cloudflare:workers"
 import type {
+    AdminCreateUploadRequest,
+    AdminCreateUploadResponse,
     CheckUploadTokenRequest,
     CheckUploadTokenResponse,
     SessionRequest,
@@ -11,8 +13,9 @@ import type {
 } from "../api/upload"
 import {generateFileId} from "../util/fileid"
 import {textResponse} from "../util/response"
+import {generateUploadToken} from "../util/uploadtoken"
 import {cancelMultipartUpload, completeMultipartUpload, generatePartUrls, initiateMultipartUpload} from "./multipart"
-import {getUploadSession, State} from "./session"
+import {getUploadSession, State, type UploadSessionInfo} from "./session"
 
 export async function checkUploadSession(request: CheckUploadTokenRequest): Promise<Response> {
     const session = await getUploadSession(request.token)
@@ -136,6 +139,20 @@ async function validateUploadSessionInProgress(request: SessionRequest): Promise
         fileId: fileId,
         uploadId: uploadId,
     }
+}
+
+export async function adminCreateUpload(_request: AdminCreateUploadRequest): Promise<Response> {
+    const token = generateUploadToken()
+    const session: UploadSessionInfo = {
+        state: State.Pending,
+    }
+
+    await env.UPLOAD_SESSIONS.put(token, JSON.stringify(session))
+
+    const response: AdminCreateUploadResponse = {
+        upload_token: token,
+    }
+    return Response.json(response)
 }
 
 // Error messages

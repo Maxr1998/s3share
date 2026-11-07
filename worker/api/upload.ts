@@ -58,3 +58,13 @@ export const UploadCompleteResponseSchema = z.object({
 })
 
 export type UploadCompleteResponse = z.infer<typeof UploadCompleteResponseSchema>
+
+export const AdminCreateUploadRequestSchema = z.object({})
+
+export type AdminCreateUploadRequest = z.infer<typeof AdminCreateUploadRequestSchema>
+
+export const AdminCreateUploadResponseSchema = z.object({
+    upload_token: z.string().nonempty(),
+})
+
+export type AdminCreateUploadResponse = z.infer<typeof AdminCreateUploadResponseSchema>

@@ -1,17 +1,28 @@
 import {
+    AdminCreateUploadRequestSchema,
     CheckUploadTokenRequestSchema,
     UploadCompleteRequestSchema,
     UploadCreateRequestSchema,
     UploadPartsRequestSchema,
 } from "./api/upload"
 import {download} from "./download/handler"
-import {checkUploadSession, completeUpload, createUpload, generateUploadParts} from "./upload/handler"
+import {
+    adminCreateUpload,
+    checkUploadSession,
+    completeUpload,
+    createUpload,
+    generateUploadParts,
+} from "./upload/handler"
+import {validateAccess} from "./util/access"
 import {handlePostJson, hasMethod} from "./util/request"
-import {methodNotAllowed} from "./util/response"
+import {methodNotAllowed, textResponse} from "./util/response"
 
 export default {
     async fetch(request: Request): Promise<Response> {
         const url = new URL(request.url)
+        if (url.pathname.startsWith('/api/admin/') && !await validateAccess(request)) {
+            return textResponse(403, 'Forbidden', 'Access denied')
+        }
         switch (url.pathname) {
             case '/api/download':
                 if (!hasMethod(request, 'GET')) {
@@ -26,6 +37,8 @@ export default {
                 return await handlePostJson(request, UploadPartsRequestSchema, generateUploadParts)
             case '/api/upload/complete':
                 return await handlePostJson(request, UploadCompleteRequestSchema, completeUpload)
+            case '/api/admin/create-upload':
+                return await handlePostJson(request, AdminCreateUploadRequestSchema, adminCreateUpload)
             default:
                 return new Response('Not Found', {
                     status: 404,

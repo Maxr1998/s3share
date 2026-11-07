@@ -4,11 +4,14 @@
         <Download/>
     {:else if currentRoute === "upload"}
         <Upload/>
+    {:else if currentRoute === "admin"}
+        <Admin/>
     {/if}
 </div>
 
 <script lang="ts">
     import {parseRoute} from "./router"
+    import Admin from "./routes/Admin.svelte"
     import Download from "./routes/Download.svelte"
     import Upload from "./routes/Upload.svelte"
 
